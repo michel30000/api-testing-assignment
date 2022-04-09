@@ -10,5 +10,7 @@ If robot framework installed correctly you are ready to run the test suite using
 Build the container using
 `docker build -t api-testing-assignment .`
 
-Run the container, optionally using -v flag to map container directory /robot/results/ to a local directory eg.:
+Run the container with `docker run  api-testing-assignment`
+
+You can optionally use the -v flag to map the test result directory `/robot/results/` to a local directory eg.:
 `docker run -v /Users/Michel/Documents/api-testing-assignment/docker_results:/robot/results api-testing-assignment`
