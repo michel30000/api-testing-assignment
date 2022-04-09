@@ -22,6 +22,7 @@ incorrect http method on top rated movies
     Then the api response code must be 405
 
 correct request for rating a movie
+    [Teardown]  delete rating for movie 278
     Given a moviedb guest session is created
     When the moviedb api receives a POST request on path /movie/278/rating with json body <{"value": 8.5}>
     Then the api response code must be 201
@@ -68,3 +69,6 @@ the api response code must be ${expected_response_code}
 set initial api paramaters
     ${api_params}=  Create dictionary  api_key=${moviedb_api_key}
     Set test variable  ${api_params}
+
+delete rating for movie ${movie_id}
+    DELETE  ${moviedb_endpoint}/movie/${movie_id}/rating  params=${api_params}
