@@ -1,13 +1,13 @@
 *** Settings ***
 Library  RequestsLibrary
+Library  Collections
+Test setup  set initial api paramaters
 
 *** Variables ***
 ${your_movie_db_api_key_v3}  a9745c01ee1fbad5f4c587c4b179e230
 ${your_movie_db_api_key_v4}  eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhOTc0NWMwMWVlMWZiYWQ1ZjRjNTg3YzRiMTc5ZTIzMCIsInN1YiI6IjYyNTFjM2I0MDkxOTFiMDA2NTc0ZTY5NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FItZu3GC0-tVNczAhZWsQ5VwSCXKeikKCbcBisiuGfw
 
 ${moviedb_endpoint}  https://api.themoviedb.org/3
-${api_params}  api_key=${your_movie_db_api_key_v3}
-
 
 *** Test Cases ***
 correct request for top rated movies
@@ -20,23 +20,53 @@ unauthorized request for top rated movies
     Then the api response code must be 401
 
 incorrect http method on top rated movies
-    When the moviedb api receives a POST request on path /movie/top_rated
+    When the moviedb api receives a DELETE request on path /movie/top_rated
     Then the api response code must be 405
 
 correct request for rating a movie
-    When the moviedb api receives a GET request on path /rate-movie
+    Given a moviedb guest session is created
+    When the moviedb api receives a POST request on path /movie/278/rating with json body <{"value": 8.5}>
+    Then the api response code must be 201
+
+unauthorized request for rating a movie
+    Given a moviedb guest session is created
+    And the moviedb api key used is <hunter2>
+    When the moviedb api receives a POST request on path /movie/278/rating with json body <{"value": 8.5}>
+    Then the api response code must be 401
+
+rating a movie without a guest session
+    When the moviedb api receives a POST request on path /movie/278/rating with json body <{"value": 8.5}>
+    Then the api response code must be 401
 
 *** Keywords ***
-the moviedb api receives a GET request on path ${path:/.*}
-    ${api_response}=  GET  ${moviedb_endpoint}${path}  params=${api_params}  expected_status=anything
+### Given keywords 
+the moviedb api key used is <${api_key}>
+    Set To Dictionary  ${api_params}  api_key=${api_key}
+
+the moviedb guest session id used is <${guest_Session_id}>
+    Set To Dictionary  ${api_params}  guest_session_id=${guest_Session_id}
+
+a moviedb guest session is created
+    ${response}=  GET  ${moviedb_endpoint}/authentication/guest_session/new  params=${api_params}
+    Set To Dictionary  ${api_params}  guest_session_id=${response.json()}[guest_session_id]
+
+### When keywords
+the moviedb api receives a ${req_type:GET|DELETE} request on path ${path:/.*}
+    ${api_response}=  Run keyword  ${req_type}  ${moviedb_endpoint}${path}  params=${api_params}  expected_status=anything
     Set test variable  ${api_response}
     Run keyword and continue on failure  Log  ${api_response.json()}
 
-the moviedb api receives a ${req_type:PUT|POST} request on path ${path:/.*}
-    
+the moviedb api receives a POST request on path ${path:/.*} with json body <${body_json}>
+    ${body_json}=  Evaluate  json.loads($body_json)  modules=json
+    ${api_response}=  POST  ${moviedb_endpoint}${path}  json=${body_json}  params=${api_params}  expected_status=anything
+    Set test variable  ${api_response}
+    Run keyword and continue on failure  Log  ${api_response.json()}
+
+### Then keywords
 the api response code must be ${expected_response_code}
     Status should be  ${expected_response_code}
 
-the moviedb api key used is <${api_key}>
-    ${api_params}=  Create Dictionary  api_key=${api_key}
+### Support keywords
+set initial api paramaters
+    ${api_params}=  Create dictionary  api_key=${your_movie_db_api_key_v3}
     Set test variable  ${api_params}
