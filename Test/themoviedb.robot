@@ -4,9 +4,7 @@ Library  Collections
 Test setup  set initial api paramaters
 
 *** Variables ***
-${your_movie_db_api_key_v3}  a9745c01ee1fbad5f4c587c4b179e230
-${your_movie_db_api_key_v4}  eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhOTc0NWMwMWVlMWZiYWQ1ZjRjNTg3YzRiMTc5ZTIzMCIsInN1YiI6IjYyNTFjM2I0MDkxOTFiMDA2NTc0ZTY5NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FItZu3GC0-tVNczAhZWsQ5VwSCXKeikKCbcBisiuGfw
-
+${moviedb_api_key}
 ${moviedb_endpoint}  https://api.themoviedb.org/3
 
 *** Test Cases ***
@@ -68,5 +66,5 @@ the api response code must be ${expected_response_code}
 
 ### Support keywords
 set initial api paramaters
-    ${api_params}=  Create dictionary  api_key=${your_movie_db_api_key_v3}
+    ${api_params}=  Create dictionary  api_key=${moviedb_api_key}
     Set test variable  ${api_params}
