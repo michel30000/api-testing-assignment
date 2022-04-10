@@ -6,6 +6,9 @@ After pulling the repository run `pip install -r requirements.txt` to install th
 
 If robot framework installed correctly you are ready to run the test suite using `robot -v moviedb_api_key:<your_api_key_here> ./Test` (put your api key without the < and > characters!). If for some reason the robot binary was not added to your search path run `python -m robot -v moviedb_api_key:<your_api_key_here> ./Test` instead.
 
+### Test log file
+After a test run you'll find the Robot Framework test execution report (report.html) and test log (log.html) in the root of this repository.
+
 ## Running the tests in Docker
 Build the container using
 `docker build -t api-testing-assignment .`
